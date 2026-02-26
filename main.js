@@ -129,3 +129,75 @@ window.addEventListener('beforeinstallprompt', (e) => {
         });
     });
 });
+
+function loadAdminDashboard() {
+    
+    let orders = JSON.parse(localStorage.getItem("fidexOrders")) || [];
+    
+    let totalOrders = orders.length;
+    let totalRevenue = 0;
+    let customers = {};
+    let todayCount = 0;
+    
+    let today = new Date().toDateString();
+    
+    orders.forEach(order => {
+        totalRevenue += order.total;
+        
+        customers[order.name] = (customers[order.name] || 0) + 1;
+        
+        if (new Date(order.date).toDateString() === today) {
+            todayCount++;
+        }
+    });
+    
+    let topCustomer = "-";
+    let maxOrders = 0;
+    
+    for (let name in customers) {
+        if (customers[name] > maxOrders) {
+            maxOrders = customers[name];
+            topCustomer = name;
+        }
+    }
+    
+    document.getElementById("totalOrders").innerText = totalOrders;
+    document.getElementById("totalRevenue").innerText = totalRevenue;
+    document.getElementById("totalCustomers").innerText = Object.keys(customers).length;
+    document.getElementById("ordersToday").innerText = todayCount;
+    document.getElementById("topCustomer").innerText = topCustomer;
+    
+    loadAdminOrders();
+}
+
+function loadAdminOrders() {
+    
+    let orders = JSON.parse(localStorage.getItem("fidexOrders")) || [];
+    let container = document.getElementById("adminOrders");
+    
+    if (!container) return;
+    
+    let html = "";
+    
+    orders.slice().reverse().forEach(order => {
+        html += `
+        <div class="admin-order">
+            <strong>${order.ref}</strong><br>
+            ${order.name}<br>
+            ${order.quantity} packs<br>
+            ₦${order.total}<br>
+            ${order.location}<br>
+            <small>${order.date}</small>
+        </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+}
+
+function clearOrders() {
+    if (confirm("Are you sure you want to delete all orders?")) {
+        localStorage.removeItem("fidexOrders");
+        loadAdminDashboard();
+    }
+}

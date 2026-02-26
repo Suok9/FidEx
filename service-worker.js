@@ -1,5 +1,5 @@
 const CACHE_NAME = "fidex-cache-v3";
-const BASE_PATH = "/DecHost/";
+const BASE_PATH = "/FidEx/";
 
 self.addEventListener("install", event => {
     event.waitUntil(
